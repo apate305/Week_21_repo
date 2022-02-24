@@ -8,9 +8,7 @@
 # to have a basic website to show our data. And we are going to render it 
 # in the HTML file.
 
-# Building flask app to display our us_gdp file into index.html 
-
-# REMINDER: WATCH HTML SECTION IN DATACAMP AND ALEXIS WROTE AN ARTICLE
+# Building flask app to display our nobel file into index.html 
 #  HOW TO BUILD A REST API THAT DOES BASIC CRUD FUNCTIONS
 
 #pip install flask and specify what modules you need from library to make application smaller so it can go faster! 
@@ -31,6 +29,14 @@ import os
 # __name__ specifies what file this is, 
 # name or file being called from another file
 app = Flask(__name__)
+
+def hello():
+    #The is the information seen when user uses API on the home route
+    #How to access the different endpoints below when you go to the homepage!
+    text = f"go to /all to see all events <br> \
+              and /year/(year) (with a specific year specified where the parenthesis are) to see prizes for that year <br> \
+              and /add to add additional information"
+    return text
 
 # THE FOLLOWING IS HOW All OF THE NOBEL.JSON DATA FILE IS SHOWN IN LOCALHOST AND THE CLOUD(THRU AZURE)
 
@@ -59,13 +65,18 @@ def nobel():
 @app.route("/add")
 def form():
     form_url = os.path.join("templates","form.html")
+    # the send_file function lets us send the contents in the form to a client
     return send_file(form_url)
 
+#Now, we will create a decorator to get the data based on year!
 @app.route("/year/<year>",methods=['GET'])
 def add_year1(year):
     json_url = os.path.join(app.static_folder,"","nobel.json")
+    #The below line makes sure we can access the data inside the prizes key in the json file.
     data_json = json.load(open(json_url))
+    #The below line gets the data passed into the route and converts it to a variable.
     data = data_json["prizes"]
+    #Iterate through all the data in that list above to get the data for the year of interest 
     if request.method == 'GET':
         data_json = json.load(open(json_url))
         data = data_json["prizes"]
@@ -73,7 +84,7 @@ def add_year1(year):
         output_data = [x for x in data if x['year']==year]
 
         return render_template('events.html',html_page_text=output_data)
-
+#route is getting data (use GET) \ write some logic to get the POSTed data from the form
 @app.route("/year/<year>",methods=['GET','POST'])
 def add_year(year):
     json_url = os.path.join(app.static_folder,"","nobel.json")
@@ -87,11 +98,14 @@ def add_year(year):
         return render_template('events.html',html_page_text=output_data)
     
     elif request.method == 'POST':
-        year = request.form['year']
 
-        #case sensitive, so be careful!
+        #Lines 95 through 97 pull the data out of the form that’s posted. 
+        #The code is referencing those elements by the names specified in the form.html attributes. 
+        year = request.form['year']
         category = request.form['category']
         laureates = request.form['laureates']
+
+        #Lines 101 through 104 put that data into a dictionary
         prize_yr= { "year":year,
                     "category":category,
                     "laureates":laureates,
