@@ -30,10 +30,11 @@ import os
 # name or file being called from another file
 app = Flask(__name__)
 
+@app.route("/")
 def hello():
     #The is the information seen when user uses API on the home route
     #How to access the different endpoints below when you go to the homepage!
-    text = f"go to /all to see all events <br> \
+    text = f"go to /all to see all prizes <br> \
               and /year/(year) (with a specific year specified where the parenthesis are) to see prizes for that year <br> \
               and /add to add additional information"
     return text
